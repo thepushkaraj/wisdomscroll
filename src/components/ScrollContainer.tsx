@@ -75,6 +75,8 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
 
   // Handle wheel scroll
   useEffect(() => {
+    if (isChatOpen) return;
+    
     const container = containerRef.current;
     if (!container) return;
 
@@ -87,7 +89,7 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
 
     container.addEventListener('wheel', handleWheel, { passive: false });
     return () => container.removeEventListener('wheel', handleWheel);
-  }, [handleScroll]);
+  }, [handleScroll, isChatOpen]);
 
   // Handle touch scroll
   useEffect(() => {
