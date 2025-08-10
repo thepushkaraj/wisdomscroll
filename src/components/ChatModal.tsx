@@ -116,7 +116,7 @@ export default function ChatModal({ isOpen, onClose, article }: ChatModalProps) 
           </div>
           <button
             onClick={onClose}
-            className="p-3 hover:bg-gray-700/50 rounded-xl transition-all duration-200 group"
+            className="p-3 hover:bg-gray-700/50 rounded-xl transition-all duration-200 group cursor-pointer"
           >
             <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -176,7 +176,7 @@ export default function ChatModal({ isOpen, onClose, article }: ChatModalProps) 
             <button
               onClick={handleSendMessage}
               disabled={!inputValue.trim() || isTyping}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white rounded-2xl p-4 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white rounded-2xl p-4 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none cursor-pointer"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

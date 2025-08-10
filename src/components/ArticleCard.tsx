@@ -67,33 +67,37 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
           </div>
 
           <div className="space-y-4">
-            <div className="text-gray-100 leading-relaxed text-base sm:text-lg">
-              <p>{displayText}</p>
-              {article.extract.length > 280 && (
-                <button
-                  onClick={() => setShowFullText(!showFullText)}
-                  className="inline-flex items-center space-x-1 text-blue-400 hover:text-blue-300 transition-colors mt-3 font-medium text-sm"
-                >
-                  <span>{showFullText ? 'Show less' : 'Read more'}</span>
-                  <svg 
-                    className={`w-4 h-4 transition-transform ${showFullText ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-              )}
+            <div className="text-gray-100 leading-relaxed text-base sm:text-lg max-h-56 sm:max-h-64 md:max-h-72 overflow-y-auto pr-1">
+              <div className="relative">
+                <p className="whitespace-pre-line">{displayText}</p>
+                {article.extract.length > 280 && (
+                  <div className={`sticky bottom-0 pt-3 ${showFullText ? "bg-gradient-to-t" : "bg-none"} from-gray-900 via-gray-900/80 to-transparent`}>
+                    <button
+                      onClick={() => setShowFullText(!showFullText)}
+                      className="inline-flex items-center space-x-1 text-blue-400 hover:text-blue-300 transition-colors font-medium text-sm"
+                    >
+                      <span className='cursor-pointer'>{showFullText ? 'Show less' : 'Read more'}</span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${showFullText ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-6 space-y-4 sm:space-y-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
                 onClick={onChatClick}
-                className="flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
+                className="flex cursor-pointer items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
