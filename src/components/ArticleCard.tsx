@@ -3,16 +3,18 @@
 import { ArticleCardProps } from '@/app/types';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useMediaQuery } from 'react-responsive';
 
 export default function ArticleCard({ article, isActive, onChatClick }: ArticleCardProps) {
   const [imageError, setImageError] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
+  const isMobile = useMediaQuery({ query: '(max-width: 640px)' });
 
   const handleImageError = () => {
     setImageError(true);
   };
 
-  const truncateText = (text: string, maxLength: number = 280) => {
+  const truncateText = (text: string, maxLength: number = isMobile ? 150 : 280) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
@@ -38,11 +40,10 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
       )}
 
       {/* Content Container */}
-      <div className="relative z-10 flex-1 flex flex-col px-6 py-8 pb-24 max-w-4xl mx-auto w-full">
-        {/* Top section with centered image */}
+      <div className="relative sm:flex-1 z-10 flex flex-col px-6 py-16 pb-24 max-w-4xl mx-auto w-full">
         <div className="flex-1 flex items-center justify-center min-h-0 py-8">
-          {article.thumbnail && !imageError && (
-            <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+          <div className="relative mt-10 sm:mt-0 w-40 h-40 sm:w-72 sm:h-72 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+            {article.thumbnail && !imageError && (
               <Image
                 src={article.thumbnail.source}
                 alt={article.title}
@@ -52,9 +53,9 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
                 sizes="(max-width: 640px) 288px, 320px"
                 priority={isActive}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-            </div>
-          )}
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          </div>
         </div>
 
         {/* Bottom content section */}
@@ -67,10 +68,30 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
           </div>
 
           <div className="space-y-4">
-            <div className="text-gray-100 leading-relaxed text-base sm:text-lg max-h-56 sm:max-h-64 md:max-h-72 overflow-y-auto pr-1">
+            <div className="text-gray-100 leading-relaxed text-base sm:text-lg max-h-46 sm:max-h-64 overflow-y-auto pr-1">
               <div className="relative">
                 <p className="whitespace-pre-line">{displayText}</p>
-                {article.extract.length > 280 && (
+
+                {article.extract.length > 150 && isMobile && (
+                  <div className={`sticky bottom-0 pt-3 ${showFullText ? "bg-gradient-to-t" : "bg-none"} from-gray-900 via-gray-900/80 to-transparent`}>
+                    <button
+                      onClick={() => setShowFullText(!showFullText)}
+                      className="inline-flex items-center space-x-1 text-blue-400 hover:text-blue-300 transition-colors font-medium text-sm"
+                    >
+                      <span className='cursor-pointer'>{showFullText ? 'Show less' : 'Read more'}</span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${showFullText ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+
+                {article.extract.length > 280 && !isMobile && (
                   <div className={`sticky bottom-0 pt-3 ${showFullText ? "bg-gradient-to-t" : "bg-none"} from-gray-900 via-gray-900/80 to-transparent`}>
                     <button
                       onClick={() => setShowFullText(!showFullText)}
@@ -93,7 +114,7 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 space-y-4 sm:space-y-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
                 onClick={onChatClick}
@@ -104,7 +125,7 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
                 </svg>
                 <span>Ask AI</span>
               </button>
-              
+
               <a
                 href={article.fullurl}
                 target="_blank"
