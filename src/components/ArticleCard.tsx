@@ -4,11 +4,13 @@ import { ArticleCardProps } from '@/app/types';
 import { useState } from 'react';
 import Image from 'next/image';
 import { useMediaQuery } from 'react-responsive';
+import { useBookmarks } from '@/hooks/useBookmarks';
 
 export default function ArticleCard({ article, isActive, onChatClick }: ArticleCardProps) {
   const [imageError, setImageError] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
   const isMobile = useMediaQuery({ query: '(max-width: 640px)' });
+  const { isBookmarked, toggleBookmark } = useBookmarks();
 
   const handleImageError = () => {
     setImageError(true);
@@ -114,11 +116,11 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-3 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
               <button
                 onClick={onChatClick}
-                className="flex cursor-pointer items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
+                className="flex cursor-pointer items-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -126,11 +128,31 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
                 <span>Ask AI</span>
               </button>
 
+              <button
+                onClick={() => toggleBookmark(article)}
+                className="flex cursor-pointer items-center gap-2 sm:gap-3 bg-gray-700/80 hover:bg-gray-600/80 backdrop-blur-sm transition-all duration-200 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
+              >
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  fill={isBookmarked(article.pageid) ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                  />
+                </svg>
+                <span>{isBookmarked(article.pageid) ? 'Bookmarked' : 'Bookmark'}</span>
+              </button>
+
               <a
                 href={article.fullurl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 sm:space-x-3 bg-gray-700/80 hover:bg-gray-600/80 backdrop-blur-sm transition-all duration-200 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
+                className="flex items-center gap-2 sm:gap-3 bg-gray-700/80 hover:bg-gray-600/80 backdrop-blur-sm transition-all duration-200 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -139,14 +161,13 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
               </a>
             </div>
 
-            <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-400">
+            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-400">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
               </svg>
               <span>Swipe up for more</span>
             </div>
 
-            {/* Mobile navigation hint */}
             <div className="sm:hidden flex items-center justify-center space-x-2 text-xs text-gray-500 pt-2">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
@@ -157,7 +178,7 @@ export default function ArticleCard({ article, isActive, onChatClick }: ArticleC
         </div>
       </div>
 
-      {/* Improved Scroll indicator */}
+      {/* Scroll indicator */}
       <div className="absolute right-6 top-1/2 transform -translate-y-1/2 z-20">
         <div className="flex flex-col items-center space-y-3 text-white/60">
           <div className="w-1 h-12 bg-white/20 rounded-full overflow-hidden">

@@ -7,6 +7,8 @@ import ArticleCard from './ArticleCard';
 import ChatModal from './ChatModal';
 import BrandHeader from './BrandHeader';
 import LoadingSpinner from './LoadingSpinner';
+import BookmarksModal from './BookmarksModal';
+import { BookmarkedArticle, BookmarksProvider } from '@/contexts/BookmarksContext';
 
 interface ScrollContainerProps {
   initialArticles?: WikipediaPage[];
@@ -19,6 +21,7 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<WikipediaPage | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const lastScrollTime = useRef<number>(0);
@@ -75,7 +78,7 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
 
   // Handle wheel scroll
   useEffect(() => {
-    if (isChatOpen) return;
+    if (isChatOpen || isBookmarksOpen) return;
     
     const container = containerRef.current;
     if (!container) return;
@@ -89,7 +92,7 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
 
     container.addEventListener('wheel', handleWheel, { passive: false });
     return () => container.removeEventListener('wheel', handleWheel);
-  }, [handleScroll, isChatOpen]);
+  }, [handleScroll, isChatOpen, isBookmarksOpen]);
 
   // Handle touch scroll
   useEffect(() => {
@@ -127,7 +130,7 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isChatOpen) return; // Don't handle keys when chat is open
+      if (isChatOpen || isBookmarksOpen) return; // Don't handle keys when chat is open
       
       switch (e.key) {
         case 'ArrowDown':
@@ -144,7 +147,7 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleScroll, isChatOpen]);
+  }, [handleScroll, isChatOpen, isBookmarksOpen]);
 
   const handleChatClick = (article: WikipediaPage) => {
     setSelectedArticle(article);
@@ -156,12 +159,34 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
     setSelectedArticle(null);
   };
 
+  const handleBookmarksOpen = () => {
+    setIsBookmarksOpen(true);
+  };
+
+  const handleBookmarksClose = () => {
+    setIsBookmarksOpen(false);
+  };
+
+  const handleBookmarkedArticleSelect = (article: BookmarkedArticle) => {
+    const existingIndex = articles.findIndex(a => a.pageid === article.pageid);
+    
+    if (existingIndex !== -1) {
+      setCurrentIndex(existingIndex);
+    } else {
+      setArticles(prev => [article, ...prev]);
+      setCurrentIndex(0);
+    }
+    
+    setIsBookmarksOpen(false);
+  };
+
   if (isInitialLoad && articles.length === 0) {
     return <LoadingSpinner message="Loading wisdom..." />;
   }
 
   return (
-    <div ref={containerRef} className="relative h-screen overflow-hidden">
+    <BookmarksProvider>
+      <div ref={containerRef} className="relative h-screen overflow-hidden">
       {/* Articles */}
       <div
         className="transition-transform duration-500 ease-out"
@@ -190,20 +215,7 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
       )}
 
       {/* Brand Header */}
-      <BrandHeader />
-
-      {/* Navigation hints - Hidden on mobile */}
-      {/* <div className="absolute bottom-8 left-4 md:left-6 z-30 hidden sm:block">
-        <div className="bg-black/30 backdrop-blur-md rounded-2xl px-4 py-3 border border-white/10">
-          <div className="flex items-center space-x-2 text-white/70 text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19V5m0 0l-7 7m7-7l7 7" />
-            </svg>
-            <span className="font-medium hidden md:inline">Navigate with ↑↓ keys, wheel, or swipe</span>
-            <span className="font-medium md:hidden">Navigate: ↑↓ • Swipe</span>
-          </div>
-        </div>
-      </div> */}
+      <BrandHeader onBookmarksClick={handleBookmarksOpen} />
 
       {/* Article counter */}
       <div className="absolute bottom-8 right-4 md:right-6 z-30">
@@ -225,6 +237,14 @@ export default function ScrollContainer({ initialArticles = [] }: ScrollContaine
           article={selectedArticle}
         />
       )}
-    </div>
+
+      {/* Bookmarks Modal */}
+      <BookmarksModal
+        isOpen={isBookmarksOpen}
+        onClose={handleBookmarksClose}
+        onArticleSelect={handleBookmarkedArticleSelect}
+      />
+      </div>
+    </BookmarksProvider>
   );
 } 
